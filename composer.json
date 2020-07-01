@@ -1,5 +1,5 @@
 {
-  "name": "creative/work-test",
+  "name": "gena20/work-test",
   "description": "Test task for a job seeker",
   "type": "project",
   "license": "MIT",
@@ -7,6 +7,10 @@
     {
       "name": "Andrew Zhdanovskih",
       "email": "andrew72ru@gmail.com"
+    },
+    {
+      "name": "Gena Peryatin",
+      "email": "peryatin.gena@yandex.ru"
     }
   ],
   "minimum-stability": "stable",
