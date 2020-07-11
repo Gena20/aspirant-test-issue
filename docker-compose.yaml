@@ -11,8 +11,8 @@ services:
       COMPOSER_MEMORY_LIMIT: -1
       COMPOSER_ALLOW_SUPERUSER: 1
       APP_ENV: 'dev'
-    ports:
-      - 8080:8080
+    depends_on:
+      - database
 
   database:
     image: mysql:5.7
