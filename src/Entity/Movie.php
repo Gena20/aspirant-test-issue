@@ -7,12 +7,14 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MovieRepository")
- * @ORM\Table(name="movie", indexes={@Index(columns={"title"})})
+ * @ORM\Table(name="movies", indexes={@Index(columns={"title"})})
  */
 final class Movie
 {
@@ -53,6 +55,16 @@ final class Movie
      * @ORM\Column(nullable=true)
      */
     private $image;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="likedMovies")
+     */
+    private Collection $likedUsers;
+
+    public function __construct()
+    {
+        $this->likedUsers = new ArrayCollection();
+    }
 
     /**
      * @return string|null
@@ -158,6 +170,26 @@ final class Movie
     public function setPubDate(?\DateTime $pubDate): self
     {
         $this->pubDate = $pubDate;
+
+        return $this;
+    }
+
+    public function addUser(User $movie): self
+    {
+        if (!$this->likedUsers->contains($movie)) {
+            $this->likedUsers[] = $movie;
+            $movie->addMovie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $movie): self
+    {
+        if ($this->likedUsers->contains($movie)) {
+            $this->likedUsers->removeElement($movie);
+            $movie->removeMovie($this);
+        }
 
         return $this;
     }
