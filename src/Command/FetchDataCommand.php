@@ -26,31 +26,38 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class FetchDataCommand extends Command
 {
     private const SOURCE = 'https://trailers.apple.com/trailers/home/rss/newtrailers.rss';
+    private const AMOUNT = 10;
+    private const MAX_AMOUNT = 20;
 
     /**
      * @var string
      */
-    protected static $defaultName = 'fetch:trailers';
+    protected static string $defaultName = 'fetch:trailers';
 
     /**
      * @var ClientInterface
      */
-    private $httpClient;
+    private ClientInterface $httpClient;
 
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var string
      */
-    private $source;
+    private string $source;
+
+    /**
+     * @var int
+     */
+    private int $amount;
 
     /**
      * @var EntityManagerInterface
      */
-    private $doctrine;
+    private EntityManagerInterface $doctrine;
 
     /**
      * FetchDataCommand constructor.
@@ -71,6 +78,7 @@ class FetchDataCommand extends Command
     {
         $this
             ->setDescription('Fetch data from iTunes Movie Trailers')
+            ->addArgument('amount', InputArgument::OPTIONAL, 'Define amount of trailers')
             ->addArgument('source', InputArgument::OPTIONAL, 'Overwrite source')
         ;
     }
@@ -79,12 +87,19 @@ class FetchDataCommand extends Command
     {
         $this->logger->info(sprintf('Start %s at %s', __CLASS__, (string) date_create()->format(DATE_ATOM)));
         $source = self::SOURCE;
+        $amount = self::AMOUNT;
         if ($input->getArgument('source')) {
             $source = $input->getArgument('source');
+        }
+        if ($input->getArgument('amount')) {
+            $amount = (int)$input->getArgument('amount');
         }
 
         if (!is_string($source)) {
             throw new RuntimeException('Source must be string');
+        }
+        if ($amount > self::MAX_AMOUNT || $amount <= 0) {
+            throw new RuntimeException('Amount must be between 1 and 20');
         }
         $io = new SymfonyStyle($input, $output);
         $io->title(sprintf('Fetch data from %s', $source));
@@ -98,7 +113,7 @@ class FetchDataCommand extends Command
             throw new RuntimeException(sprintf('Response status is %d, expected %d', $status, 200));
         }
         $data = $response->getBody()->getContents();
-        $this->processXml($data);
+        $this->processXml($data, $amount);
 
         $this->logger->info(sprintf('End %s at %s', __CLASS__, (string) date_create()->format(DATE_ATOM)));
 
@@ -107,9 +122,10 @@ class FetchDataCommand extends Command
 
     /**
      * @param string $data
+     *
      * @throws \Exception
      */
-    protected function processXml(string $data): void
+    protected function processXml(string $data, int $amount): void
     {
         $xml = (new \SimpleXMLElement($data))->children();
         $namespace = $xml->getNamespaces(true)['content'];
@@ -117,7 +133,8 @@ class FetchDataCommand extends Command
         if (!property_exists($xml, 'channel')) {
             throw new RuntimeException('Could not find \'channel\' element in feed');
         }
-        foreach ($xml->channel->item as $item) {
+        for ($i = 0; $i < $amount; $i++) {
+            $item = $xml->channel->item[$i];
             $trailer = $this->getMovie((string) $item->title)
                 ->setTitle((string) $item->title)
                 ->setDescription((string) $item->description)
