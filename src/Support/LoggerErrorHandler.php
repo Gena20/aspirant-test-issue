@@ -17,7 +17,7 @@ class LoggerErrorHandler extends ErrorHandler
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     /**
      * LoggerErrorHandler constructor.
