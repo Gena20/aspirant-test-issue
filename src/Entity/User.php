@@ -39,6 +39,11 @@ final class User
      */
     private ?string $password;
 
+    /**
+     * @var string
+     * @ORM\Column(type="string")
+     */
+    private ?string $role;
 
     /**
      * @ORM\ManyToMany(targetEntity=Movie::class, inversedBy="likedUsers")
@@ -117,5 +122,25 @@ final class User
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $role
+     *
+     * @return User
+     */
+    public function setRole(string $role): self
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRole(): string
+    {
+        return $this->role;
     }
 }
