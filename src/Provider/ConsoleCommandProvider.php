@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Provider;
 
+use App\Command\CreateUserCommand;
 use App\Command\FetchDataCommand;
 use App\Command\RouteListCommand;
 use App\Support\CommandMap;
@@ -35,7 +36,12 @@ class ConsoleCommandProvider implements ServiceProviderInterface
             return new FetchDataCommand($container->get(ClientInterface::class), $container->get(LoggerInterface::class), $container->get(EntityManagerInterface::class));
         });
 
+        $container->set(CreateUserCommand::class, static function (ContainerInterface $container) {
+            return new CreateUserCommand($container->get(LoggerInterface::class), $container->get(EntityManagerInterface::class));
+        });
+
         $container->get(CommandMap::class)->set(RouteListCommand::getDefaultName(), RouteListCommand::class);
         $container->get(CommandMap::class)->set(FetchDataCommand::getDefaultName(), FetchDataCommand::class);
+        $container->get(CommandMap::class)->set(CreateUserCommand::getDefaultName(), CreateUserCommand::class);
     }
 }
