@@ -18,7 +18,7 @@ class RouteListCommand extends Command
     /**
      * @var string
      */
-    protected static string $defaultName = 'debug:router';
+    protected static $defaultName = 'debug:router';
 
     /**
      * @var RouteCollectorInterface

@@ -32,7 +32,7 @@ class FetchDataCommand extends Command
     /**
      * @var string
      */
-    protected static string $defaultName = 'fetch:trailers';
+    protected static $defaultName = 'fetch:trailers';
 
     /**
      * @var ClientInterface

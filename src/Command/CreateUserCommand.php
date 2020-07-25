@@ -31,7 +31,7 @@ class CreateUserCommand extends Command
     /**
      * @var string
      */
-    protected static string $defaultName = 'create:user';
+    protected static $defaultName = 'create:user';
 
     /**
      * @var LoggerInterface
